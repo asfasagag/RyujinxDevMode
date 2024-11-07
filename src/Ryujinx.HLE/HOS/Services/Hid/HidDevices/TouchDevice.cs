@@ -1,5 +1,6 @@
 using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Common;
 using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.TouchScreen;
+using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Gesture;
 using System;
 
 namespace Ryujinx.HLE.HOS.Services.Hid
@@ -43,6 +44,20 @@ namespace Ryujinx.HLE.HOS.Services.Hid
             }
 
             lifo.Write(ref newState);
+
+            // Gestures shouldn't go here, but not sure where else
+            {
+                ref RingLifo<GestureState> lifoG = ref _device.Hid.SharedMemory.Gesture;
+
+                ref GestureState previousEntryG = ref lifoG.GetCurrentEntryRef();
+
+                GestureState newStateG = new()
+                {
+                    SamplingNumber = previousEntryG.SamplingNumber + 1,
+                };
+
+                lifoG.Write(ref newStateG);
+            }
         }
     }
 }

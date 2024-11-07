@@ -143,7 +143,7 @@ namespace Ryujinx.HLE.HOS.Services.Hid
 
             for (int entry = 0; entry < Hid.SharedMemEntryCount; entry++)
             {
-                context.Device.Hid.DebugMouse.Update();
+                context.Device.Hid.DebugMouse.Update(0, 0);
             }
 
             Logger.Stub?.PrintStub(LogClass.ServiceHid, new { appletResourceUserId });
@@ -962,6 +962,7 @@ namespace Ryujinx.HLE.HOS.Services.Hid
             if (HidUtils.IsValidNpadIdType(npadIdType))
             {
                 context.Device.Hid.SharedMemory.Npads[(int)HidUtils.GetIndexFromNpadIdType(npadIdType)].InternalState.JoyAssignmentMode = NpadJoyAssignmentMode.Single;
+                context.Device.Hid.SharedMemory.Npads[(int)HidUtils.GetIndexFromNpadIdType(npadIdType)].InternalState.StyleSet &= ~(NpadStyleTag.JoyDual);
             }
 
             return ResultCode.Success;
@@ -1134,6 +1135,7 @@ namespace Ryujinx.HLE.HOS.Services.Hid
             npadIdTypeIsSet = false;
 
             context.Device.Hid.SharedMemory.Npads[(int)HidUtils.GetIndexFromNpadIdType(npadIdType)].InternalState.JoyAssignmentMode = NpadJoyAssignmentMode.Single;
+            context.Device.Hid.SharedMemory.Npads[(int)HidUtils.GetIndexFromNpadIdType(npadIdType)].InternalState.StyleSet &= ~(NpadStyleTag.JoyDual);
 
             // TODO: Service seems to use the npadJoyDeviceType to find the nearest other Npad available and merge them to dual.
             //       If one is found, it returns the npadIdType of the other Npad and a bool.
@@ -1827,6 +1829,15 @@ namespace Ryujinx.HLE.HOS.Services.Hid
         [CommandCmif(525)] // 5.1.0+
         // SetPalmaBoostMode(bool)
         public ResultCode SetPalmaBoostMode(ServiceCtx context)
+        {
+            // NOTE: Stubbed in system module.
+
+            return ResultCode.Success;
+        }
+
+        [CommandCmif(527)] // 8.0.0+
+        // EnablePalmaBoostMode(...)
+        public ResultCode EnablePalmaBoostMode(ServiceCtx context)
         {
             // NOTE: Stubbed in system module.
 

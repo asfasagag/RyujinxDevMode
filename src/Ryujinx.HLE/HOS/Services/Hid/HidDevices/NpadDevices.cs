@@ -379,53 +379,51 @@ namespace Ryujinx.HLE.HOS.Services.Hid
 
             ref NpadInternalState currentNpad = ref _device.Hid.SharedMemory.Npads[(int)state.PlayerId].InternalState;
 
-            if (currentNpad.StyleSet == NpadStyleTag.None)
-            {
-                return;
-            }
-
             ref RingLifo<NpadCommonState> lifo = ref GetCommonStateLifo(ref currentNpad);
 
-            NpadCommonState newState = new()
+            if (currentNpad.StyleSet != NpadStyleTag.None)
             {
-                Buttons = (NpadButton)state.Buttons,
-                AnalogStickL = new AnalogStickState
+                NpadCommonState newState = new()
                 {
-                    X = state.LStick.Dx,
-                    Y = state.LStick.Dy,
-                },
-                AnalogStickR = new AnalogStickState
+                    Buttons = (NpadButton)state.Buttons,
+                    AnalogStickL = new AnalogStickState
+                    {
+                        X = state.LStick.Dx,
+                        Y = state.LStick.Dy,
+                    },
+                    AnalogStickR = new AnalogStickState
+                    {
+                        X = state.RStick.Dx,
+                        Y = state.RStick.Dy,
+                    },
+                    Attributes = NpadAttribute.IsConnected,
+                };
+
+                switch (currentNpad.StyleSet)
                 {
-                    X = state.RStick.Dx,
-                    Y = state.RStick.Dy,
-                },
-                Attributes = NpadAttribute.IsConnected,
-            };
+                    case NpadStyleTag.Handheld:
+                    case NpadStyleTag.FullKey:
+                        newState.Attributes |= NpadAttribute.IsWired;
+                        break;
+                    case NpadStyleTag.JoyDual:
+                        newState.Attributes |= NpadAttribute.IsLeftConnected |
+                                               NpadAttribute.IsRightConnected;
+                        break;
+                    case NpadStyleTag.JoyLeft:
+                        newState.Attributes |= NpadAttribute.IsLeftConnected;
+                        break;
+                    case NpadStyleTag.JoyRight:
+                        newState.Attributes |= NpadAttribute.IsRightConnected;
+                        break;
+                }
 
-            switch (currentNpad.StyleSet)
-            {
-                case NpadStyleTag.Handheld:
-                case NpadStyleTag.FullKey:
-                    newState.Attributes |= NpadAttribute.IsWired;
-                    break;
-                case NpadStyleTag.JoyDual:
-                    newState.Attributes |= NpadAttribute.IsLeftConnected |
-                                           NpadAttribute.IsRightConnected;
-                    break;
-                case NpadStyleTag.JoyLeft:
-                    newState.Attributes |= NpadAttribute.IsLeftConnected;
-                    break;
-                case NpadStyleTag.JoyRight:
-                    newState.Attributes |= NpadAttribute.IsRightConnected;
-                    break;
-            }
+                WriteNewInputEntry(ref lifo, ref newState);
 
-            WriteNewInputEntry(ref lifo, ref newState);
-
-            // Mirror data to Default layout just in case
-            if (!currentNpad.StyleSet.HasFlag(NpadStyleTag.SystemExt))
-            {
-                WriteNewInputEntry(ref currentNpad.SystemExt, ref newState);
+                // Mirror data to Default layout just in case
+                if (!currentNpad.StyleSet.HasFlag(NpadStyleTag.SystemExt))
+                {
+                    WriteNewInputEntry(ref currentNpad.SystemExt, ref newState);
+                }
             }
 
             UpdateUnusedInputIfNotEqual(ref lifo, ref currentNpad.FullKey);

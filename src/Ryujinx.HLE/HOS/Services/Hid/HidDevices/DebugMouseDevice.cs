@@ -7,7 +7,7 @@ namespace Ryujinx.HLE.HOS.Services.Hid
     {
         public DebugMouseDevice(Switch device, bool active) : base(device, active) { }
 
-        public void Update()
+        public void Update(int mouseX, int mouseY, uint buttons = 0, int scrollX = 0, int scrollY = 0, bool connected = false)
         {
             ref RingLifo<DebugMouseState> lifo = ref _device.Hid.SharedMemory.DebugMouse;
 
@@ -20,7 +20,14 @@ namespace Ryujinx.HLE.HOS.Services.Hid
 
             if (Active)
             {
-                // TODO: This is a debug device only present in dev environment, do we want to support it?
+                newState.Buttons = (DebugMouseButton)buttons;
+                newState.X = mouseX;
+                newState.Y = mouseY;
+                newState.DeltaX = mouseX - previousEntry.X;
+                newState.DeltaY = mouseY - previousEntry.Y;
+                newState.WheelDeltaX = scrollX;
+                newState.WheelDeltaY = scrollY;
+                newState.Attributes = connected ? DebugMouseAttribute.IsConnected : DebugMouseAttribute.None;
             }
 
             lifo.Write(ref newState);
