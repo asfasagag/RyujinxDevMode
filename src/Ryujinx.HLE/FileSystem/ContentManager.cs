@@ -905,23 +905,26 @@ namespace Ryujinx.HLE.FileSystem
                     ncaStorage.Dispose();
                 }
 
-                if (metaEntries == null)
-                {
-                    throw new FileNotFoundException("System update title was not found in the firmware package.");
-                }
+                // Dev System updates do not have SystemUpdateTitle
+                //if (metaEntries == null)
+                //{
+                //    throw new FileNotFoundException("System update title was not found in the firmware package.");
+                //}
 
-                foreach (CnmtContentMetaEntry metaEntry in metaEntries)
+                foreach (var titleId in updateNcas.Keys.ToArray())
                 {
-                    if (updateNcas.TryGetValue(metaEntry.TitleId, out List<(NcaContentType type, string path)> ncaEntry))
+                    if (updateNcas.TryGetValue(titleId, out var ncaEntry))
                     {
                         string metaNcaPath = ncaEntry.FirstOrDefault(x => x.type == NcaContentType.Meta).path;
                         string contentPath = ncaEntry.FirstOrDefault(x => x.type != NcaContentType.Meta).path;
 
                         // Nintendo in 9.0.0, removed PPC and only kept the meta nca of it.
                         // This is a perfect valid case, so we should just ignore the missing content nca and continue.
-                        if (contentPath == null)
+                        //
+                        // Dev updates may have contents without meta, ignore these
+                        if (metaNcaPath == null ||  contentPath == null)
                         {
-                            updateNcas.Remove(metaEntry.TitleId);
+                            updateNcas.Remove(titleId);
 
                             continue;
                         }
@@ -955,7 +958,7 @@ namespace Ryujinx.HLE.FileSystem
 
                                 if (LibHac.Common.Utilities.ArraysEqual(hash.ToArray(), meta.ContentEntries[0].Hash))
                                 {
-                                    updateNcas.Remove(metaEntry.TitleId);
+                                    updateNcas.Remove(titleId);
                                 }
                             }
                         }

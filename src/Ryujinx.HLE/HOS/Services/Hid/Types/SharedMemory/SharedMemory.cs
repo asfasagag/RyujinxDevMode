@@ -6,6 +6,7 @@ using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Keyboard;
 using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Mouse;
 using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Npad;
 using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.TouchScreen;
+using Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory.Gesture;
 using System.Runtime.InteropServices;
 
 namespace Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory
@@ -47,6 +48,12 @@ namespace Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory
         public Array10<NpadState> Npads;
         
         /// <summary>
+        /// Gestures.
+        /// </summary>
+        [FieldOffset(0x3BA00)]
+        public RingLifo<GestureState> Gesture;
+
+        /// <summary>
         /// Debug mouse.
         /// </summary>
         [FieldOffset(0x3DC00)]
@@ -59,7 +66,9 @@ namespace Ryujinx.HLE.HOS.Services.Hid.Types.SharedMemory
                 DebugPad = RingLifo<DebugPadState>.Create(),
                 TouchScreen = RingLifo<TouchScreenState>.Create(),
                 Mouse = RingLifo<MouseState>.Create(),
+                DebugMouse = RingLifo<DebugMouseState>.Create(),
                 Keyboard = RingLifo<KeyboardState>.Create(),
+                Gesture = RingLifo<GestureState>.Create(),
             };
 
             for (int i = 0; i < result.Npads.Length; i++)
