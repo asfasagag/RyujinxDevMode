@@ -26,7 +26,7 @@
 <p align="center">
   On October 1st 2024, Ryujinx was discontinued as the creator was forced to abandon the project.
   <br>
-  This fork is intended to be a QoL uplift for existing Ryujinx users.
+  This fork applies an anon's patches, adding development console functions to allow certain prototype / debug builds to be emulated.
   <br>
   This is not a Ryujinx revival project. This is not a Phoenix project.
   <br>
@@ -48,6 +48,8 @@
 </p>
 
 ## Usage
+
+Install development firmware and use dev.keys. The firmware can be obtained by extracting EDEV or SDEV system updater NSPs from the SDK.
 
 To run this emulator, your PC must be equipped with at least 8GiB of RAM;
 failing to meet this requirement may result in a poor gameplay experience or unexpected crashes.
