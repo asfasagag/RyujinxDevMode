@@ -121,6 +121,11 @@
                                                 </Style>
                                             </Button.Styles>
                                         </Button>
+                                        <TextBlock
+                                            HorizontalAlignment="Stretch"
+                                            Text="{Binding Path}"
+                                            TextAlignment="Start"
+                                            TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
                                 <StackPanel
