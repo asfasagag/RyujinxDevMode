@@ -90,6 +90,11 @@
                                             Text="{Binding Version}"
                                             TextAlignment="Start"
                                             TextWrapping="Wrap" />
+                                        <TextBlock
+                                            HorizontalAlignment="Stretch"
+                                            Text="{Binding Path}"
+                                            TextAlignment="Start"
+                                            TextWrapping="Wrap" />
                                     </StackPanel>
                                 </Border>
                                 <StackPanel
