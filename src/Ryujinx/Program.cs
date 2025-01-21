@@ -21,6 +21,7 @@ using Ryujinx.Graphics.Vulkan.MoltenVK;
 using Ryujinx.Headless;
 using Ryujinx.SDL2.Common;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -229,6 +230,7 @@ namespace Ryujinx.Ava
         internal static void PrintSystemInfo()
         {
             Logger.Notice.Print(LogClass.Application, $"{RyujinxApp.FullAppName} Version: {Version}");
+            Logger.Notice.Print(LogClass.Application, $".NET Runtime: {RuntimeInformation.FrameworkDescription}");
             SystemInfo.Gather().Print();
 
             var enabledLogLevels = Logger.GetEnabledLevels().ToArray();
@@ -243,16 +245,33 @@ namespace Ryujinx.Ava
                     : $"Launch Mode: {AppDataManager.Mode}");
         }
 
-        internal static void ProcessUnhandledException(object sender, Exception ex, bool isTerminating)
+        internal static void ProcessUnhandledException(object sender, Exception initialException, bool isTerminating)
         {
             Logger.Log log = Logger.Error ?? Logger.Notice;
-            string message = $"Unhandled exception caught: {ex}";
 
-            // ReSharper disable once ConstantConditionalAccessQualifier
-            if (sender?.GetType()?.AsPrettyString() is { } senderName)
-                log.Print(LogClass.Application, message, senderName);
+            List<Exception> exceptions = [];
+
+            if (initialException is AggregateException ae)
+            {
+                exceptions.AddRange(ae.InnerExceptions);
+            }
             else
-                log.PrintMsg(LogClass.Application, message);
+            {
+                exceptions.Add(initialException);
+            }
+
+            foreach (var e in exceptions)
+            {
+                string message = $"Unhandled exception caught: {e}";
+                // ReSharper disable once ConstantConditionalAccessQualifier
+                if (sender?.GetType()?.AsPrettyString() is { } senderName)
+                    log.Print(LogClass.Application, message, senderName);
+                else
+                    log.PrintMsg(LogClass.Application, message);
+            }
+            
+
+
 
             if (isTerminating)
                 Exit();

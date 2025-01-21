@@ -2,11 +2,10 @@
     x:Class="Ryujinx.Ava.UI.Controls.ApplicationListView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="clr-namespace:Ryujinx.Ava.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:Ryujinx.Ava.UI.Helpers"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
     Focusable="True"
@@ -133,12 +132,13 @@
                                     Spacing="5">
                                     <TextBlock
                                         HorizontalAlignment="Stretch"
-                                        Text="{Binding TimePlayedString}"
+                                        Text="{Binding LastPlayedString}"
                                         TextAlignment="End"
                                         TextWrapping="Wrap" />
                                     <TextBlock
                                         HorizontalAlignment="Stretch"
-                                        Text="{Binding LastPlayedString}"
+                                        Text="{Binding TimePlayedString}"
+                                        IsVisible="{Binding HasPlayedPreviously}"
                                         TextAlignment="End"
                                         TextWrapping="Wrap" />
                                     <TextBlock

@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
@@ -136,6 +137,8 @@ namespace Ryujinx.Ava.UI.Windows
             base.OnApplyTemplate(e);
 
             NotificationHelper.SetNotificationManager(this);
+
+            Executor.ExecuteBackgroundAsync(ShowIntelMacWarningAsync);
         }
 
         private void OnScalingChanged(object sender, EventArgs e)
@@ -164,7 +167,7 @@ namespace Ryujinx.Ava.UI.Windows
             });
         }
 
-        private void ApplicationLibrary_LdnGameDataReceived(object sender, LdnGameDataReceivedEventArgs e)
+        private void ApplicationLibrary_LdnGameDataReceived(LdnGameDataReceivedEventArgs e)
         {
             Dispatcher.UIThread.Post(() =>
             {
@@ -408,13 +411,10 @@ namespace Ryujinx.Ava.UI.Windows
         {
             StatusBarView.VolumeStatus.Click += VolumeStatus_CheckedChanged;
 
+            ApplicationGrid.DataContext = ApplicationList.DataContext = ViewModel;
+            
             ApplicationGrid.ApplicationOpened += Application_Opened;
-
-            ApplicationGrid.DataContext = ViewModel;
-
             ApplicationList.ApplicationOpened += Application_Opened;
-
-            ApplicationList.DataContext = ViewModel;
         }
 
         private void SetWindowSizePosition()
@@ -733,6 +733,21 @@ namespace Ryujinx.Ava.UI.Windows
                     LocaleManager.Instance[LocaleKeys.InputDialogOk], 
                     (int)Symbol.Checkmark);
             });
+        }
+
+        private static bool _intelMacWarningShown = !(OperatingSystem.IsMacOS() &&
+                                                     (RuntimeInformation.OSArchitecture == Architecture.X64 ||
+                                                      RuntimeInformation.OSArchitecture == Architecture.X86));
+
+        public static async Task ShowIntelMacWarningAsync()
+        {
+            if (_intelMacWarningShown) return;
+            
+            await Dispatcher.UIThread.InvokeAsync(async () => await ContentDialogHelper.CreateWarningDialog(
+                "Intel Mac Warning",
+                "Intel Macs are not supported and will not work properly.\nIf you continue, do not come to our Discord asking for support;\nand do not report bugs on the GitHub. They will be closed."));
+
+            _intelMacWarningShown = true;
         }
     }
 }
