@@ -18,9 +18,9 @@ using Ryujinx.Ava.UI.Applet;
 using Ryujinx.Ava.UI.Helpers;
 using Ryujinx.Ava.UI.ViewModels;
 using Ryujinx.Ava.Utilities;
-using Ryujinx.Ava.Utilities.AppLibrary;
-using Ryujinx.Ava.Utilities.Configuration;
-using Ryujinx.Ava.Utilities.Configuration.UI;
+using Ryujinx.Ava.Systems.AppLibrary;
+using Ryujinx.Ava.Systems.Configuration;
+using Ryujinx.Ava.Systems.Configuration.UI;
 using Ryujinx.Common;
 using Ryujinx.Common.Helper;
 using Ryujinx.Common.Logging;
@@ -273,11 +273,7 @@ namespace Ryujinx.Ava.UI.Windows
             LibHacHorizonManager.InitializeBcatServer();
             LibHacHorizonManager.InitializeSystemClients();
 
-            IntegrityCheckLevel checkLevel = ConfigurationState.Instance.System.EnableFsIntegrityChecks
-                ? IntegrityCheckLevel.ErrorOnInvalid
-                : IntegrityCheckLevel.None;
-
-            ApplicationLibrary = new ApplicationLibrary(VirtualFileSystem, checkLevel)
+            ApplicationLibrary = new ApplicationLibrary(VirtualFileSystem, ConfigurationState.Instance.System.IntegrityCheckLevel)
             {
                 DesiredLanguage = ConfigurationState.Instance.System.Language,
             };

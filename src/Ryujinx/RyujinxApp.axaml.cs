@@ -12,7 +12,7 @@ using Ryujinx.Ava.Common.Locale;
 using Ryujinx.Ava.UI.Helpers;
 using Ryujinx.Ava.UI.Windows;
 using Ryujinx.Ava.Utilities;
-using Ryujinx.Ava.Utilities.Configuration;
+using Ryujinx.Ava.Systems.Configuration;
 using Ryujinx.Common;
 using Ryujinx.Common.Logging;
 using System;
@@ -147,5 +147,10 @@ namespace Ryujinx.Ava
             Current is RyujinxApp { PlatformSettings: not null } app
                 ? ConvertThemeVariant(app.PlatformSettings.GetColorValues().ThemeVariant)
                 : ThemeVariant.Default;
+
+        private async void AboutRyujinx_OnClick(object sender, EventArgs e)
+        {
+            await AboutWindow.Show();
+        }
     }
 }
